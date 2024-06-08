@@ -1,0 +1,16 @@
+[Unit]
+Description=Gitea Actions runner
+Documentation=https://gitea.com/gitea/act_runner
+After=network.target
+
+[Service]
+ExecStart=/usr/local/bin/act_runner daemon --config /etc/act_runner/config.yaml
+ExecReload=/bin/kill -s HUP $MAINPID
+WorkingDirectory=/home/ubuntu
+TimeoutSec=0
+RestartSec=10
+Restart=always
+User=ubuntu
+
+[Install]
+WantedBy=multi-user.target
