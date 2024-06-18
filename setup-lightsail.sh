@@ -44,7 +44,8 @@ echo 'IdentityFile ~/.ssh/$KEY' > ~/.ssh/config
 
 # Install Gitea Action Runner
 rsync act_runner.service $TARGET:./
-rsync runner_config.yaml $TARGET:./
+sed "s/ubuntu-20.04:host/$TARGET:host/g" runner_config.yaml > runner_config.yaml.target
+rsync runner_config.yaml.target $TARGET:./runner_config.yaml
 
 token=`ssh ubuntu@$GITEA_IP "sudo su git -c 'gitea --config /etc/gitea/app.ini actions generate-runner-token'"`
 ssh $TARGET "
@@ -58,4 +59,5 @@ sudo /usr/local/bin/act_runner register --config /etc/act_runner/config.yaml --n
 sudo mv act_runner.service /etc/systemd/system/
 sudo systemctl daemon-reload
 sudo systemctl enable act_runner --now
+sudo systemctl restart act_runner
 "

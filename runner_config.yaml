@@ -36,7 +36,6 @@ runner:
   # If it's empty when execute `daemon`, will use labels in `.runner` file.
   labels:
     - "ubuntu-20.04:host"
-    - "ubuntu-18.04:host"
 
 cache:
   # Enable cache server to use actions/cache.
