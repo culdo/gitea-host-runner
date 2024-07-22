@@ -46,12 +46,20 @@ echo 'IdentityFile ~/.ssh/$KEY' > ~/.ssh/config
 rsync act_runner.service $TARGET:./
 sed "s/ubuntu-20.04:host/$TARGET:host/g" runner_config.yaml > runner_config.yaml.target
 rsync runner_config.yaml.target $TARGET:./runner_config.yaml
+if [ -f aws.cfg ]; then
+  rsync aws.cfg $TARGET:./aws.cfg
+fi
 
 token=`ssh ubuntu@$GITEA_IP "sudo su git -c 'gitea --config /etc/gitea/app.ini actions generate-runner-token'"`
 ssh $TARGET "
 sudo wget $RUNNER_BIN -xO /usr/local/bin/act_runner
 sudo chmod +x /usr/local/bin/act_runner
 sudo mkdir /etc/act_runner
+
+if [ -f aws.cfg ]; then
+  sudo mkdir -p /root/.aws
+  sudo mv aws.cfg /root/.aws/config
+fi
 
 sudo mv runner_config.yaml /etc/act_runner/config.yaml
 sudo /usr/local/bin/act_runner register --config /etc/act_runner/config.yaml --no-interactive --instance $GITEA_INSTANCE_URL --token $token --name $TARGET
